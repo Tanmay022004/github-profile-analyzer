@@ -1,6 +1,6 @@
 const db = require("../config/db");
 
-const saveProfile = (profileData, callback) => {
+const saveProfile = async (profileData) => {
   const sql = `
     INSERT INTO github_profiles
     (github_id, username, name, bio, public_repos,
@@ -26,12 +26,7 @@ const saveProfile = (profileData, callback) => {
     profileData.public_repos,
     profileData.followers,
     profileData.following,
-
-    new Date(profileData.created_at)
-      .toISOString()
-      .slice(0, 19)
-      .replace("T", " "),
-      
+    profileData.created_at,
     profileData.html_url,
     profileData.avatar_url,
     profileData.location,
@@ -39,19 +34,21 @@ const saveProfile = (profileData, callback) => {
     profileData.blog,
   ];
 
-  db.query(sql, values, callback);
+  return await db.query(sql, values);
 };
 
-const getAllProfiles = (callback) => {
-  db.query("SELECT * FROM github_profiles", callback);
+const getAllProfiles = async () => {
+  const [rows] = await db.query("SELECT * FROM github_profiles");
+  return rows;
 };
 
-const getSingleProfile = (username, callback) => {
-  db.query(
+const getSingleProfile = async (username) => {
+  const [rows] = await db.query(
     "SELECT * FROM github_profiles WHERE username = ?",
-    [username],
-    callback
+    [username]
   );
+
+  return rows;
 };
 
 module.exports = {

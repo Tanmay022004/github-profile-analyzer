@@ -1,7 +1,4 @@
-const {
-  fetchGithubProfile,
-  fetchUserRepos,
-} = require("../services/githubService");
+const { fetchGithubProfile } = require("../services/githubService");
 
 const {
   saveProfile,
@@ -15,82 +12,54 @@ const analyzeProfile = async (req, res) => {
 
     const profile = await fetchGithubProfile(username);
 
-    saveProfile(profile, (err) => {
-      if (err) {
-        return res.status(500).json({
-          message: "Database Error",
-          error: err,
-        });
-      }
+    await saveProfile(profile);
 
-      res.status(200).json({
-        success: true,
-        message: "Profile analyzed successfully",
-        data: profile,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Profile analyzed successfully",
+      data: profile,
     });
-
   } catch (error) {
-
-    if (error.response && error.response.status === 404) {
-      return res.status(404).json({
-        success: false,
-        message: "GitHub user not found",
-      });
-    }
+    console.log(error);
 
     res.status(500).json({
       success: false,
-      message: "Internal Server Error",
+      message: "Database Error",
       error: error.message,
     });
   }
 };
 
-// Fetch all analyzed profiles
-const fetchProfiles = (req, res) => {
-  getAllProfiles((err, results) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Database Error",
-        error: err.message,
-      });
-    }
+const fetchProfiles = async (req, res) => {
+  try {
+    const profiles = await getAllProfiles();
 
-    return res.status(200).json({
-      success: true,
-      total_profiles: results.length,
-      data: results,
+    res.status(200).json(profiles);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
     });
-  });
+  }
 };
 
-// Fetch single profile
-const fetchSingleProfile = (req, res) => {
-  const { username } = req.params;
+const fetchSingleProfile = async (req, res) => {
+  try {
+    const { username } = req.params;
 
-  getSingleProfile(username, (err, results) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: "Database Error",
-        error: err,
-      });
-    }
+    const profile = await getSingleProfile(username);
 
-    if (results.length === 0) {
+    if (profile.length === 0) {
       return res.status(404).json({
-        success: false,
         message: "Profile not found",
       });
     }
 
-    return res.status(200).json({
-      success: true,
-      data: results[0],
+    res.status(200).json(profile[0]);
+  } catch (error) {
+    res.status(500).json({
+      error: error.message,
     });
-  });
+  }
 };
 
 module.exports = {
