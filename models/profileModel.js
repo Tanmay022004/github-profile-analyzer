@@ -26,7 +26,12 @@ const saveProfile = async (profileData) => {
     profileData.public_repos,
     profileData.followers,
     profileData.following,
-    profileData.created_at,
+
+    new Date(profileData.created_at)
+      .toISOString()
+      .slice(0, 19)
+      .replace("T", " "),
+
     profileData.html_url,
     profileData.avatar_url,
     profileData.location,
