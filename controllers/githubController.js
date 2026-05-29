@@ -17,7 +17,14 @@ const analyzeProfile = async (req, res) => {
     res.status(200).json({
       success: true,
       message: "Profile analyzed successfully",
-      data: profile,
+      data: {
+        username: profile.login,
+        name: profile.name,
+        public_repos: profile.public_repos,
+        followers: profile.followers,
+        following: profile.following,
+        profile_url: profile.html_url,
+      },
     });
   } catch (error) {
     console.log(error);
