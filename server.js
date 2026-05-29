@@ -23,6 +23,12 @@ app.use(limiter);
 app.use(cors());
 app.use(express.json());
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "GitHub Profile Analyzer API Running",
+  });
+});
+
 app.use("/api/github", githubRoutes);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
