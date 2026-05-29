@@ -54,7 +54,7 @@ const fetchProfiles = (req, res) => {
       return res.status(500).json({
         success: false,
         message: "Database Error",
-        error: err,
+        error: err.message,
       });
     }
 
